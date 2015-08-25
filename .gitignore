@@ -1,0 +1,9 @@
+preprocessing/etl_venv
+preprocessing/1_politicians/pig_output
+preprocessing/1_politicians/raw_candidates
+preprocessing/1_politicians/raw_donations
+preprocessing/1_politicians/consulta_cand_2014.zip
+preprocessing/1_politicians/prestacao_final_2014.zip
+application/app_venv
+*.pyc
+*.log
