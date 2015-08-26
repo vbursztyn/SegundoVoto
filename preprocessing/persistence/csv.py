@@ -14,7 +14,7 @@ class CSVReader():
 
 		with open(self.path, 'r') as fIn:
 			for line in fIn:
-				tokens = line.remove('\n','').split(self.separator)
+				tokens = line.replace('\n','').split(self.separator)
 				if tokens[0][0] == '#':
 					continue
 				else:

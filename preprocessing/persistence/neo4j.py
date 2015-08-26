@@ -20,8 +20,8 @@ class Neo4jPersistence():
 		self.graph.cypher.execute(query)
 
 
-	def createProjectNode(self, pType, pId, description):	
-		newProjectNode = Project(pType=pType, pId=pId, description=description)
+	def createProjectNode(self, pType, pId, year, description):	
+		newProjectNode = Project(pType=pType, pId=pId, year=year, description=description)
 		self.graph.cypher.execute(newProjectNode.toCypher())
 
 
@@ -61,7 +61,7 @@ class Neo4jPersistence():
 
 
 	def readTopInfluencers(self, pIdStr, positionStr):
-		query =  "MATCH (project { pId: '182/2007' })<-[r1 {position: 'YES'}]-(congressman)"
+		query =  "MATCH (project { pId: '171' })<-[r1 {position: 'SIM'}]-(congressman)"
 		query += "<-[r2:DONATES]-(company)-[r3:SELLS]->(product)"
 		query += " RETURN company.name, sum(r2.value / congressman.total) as total_donation, product.name, product.alternative"
 		query += " ORDER BY total_donation DESC"

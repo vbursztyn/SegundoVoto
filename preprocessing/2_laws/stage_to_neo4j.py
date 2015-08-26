@@ -70,33 +70,29 @@ class ProjectFetcher():
 
 
 	def parseVoting(self):
+		votingObj = dict()
+
 		for congressman in self.votingObj.Deputado:
 			name = congressman['Nome'].strip().encode('utf8', 'replace')
 			vote = congressman['Voto'][0]
-			print name + ';' + positions[vote]
+			votingObj[name] = positions[vote]
+
+		return votingObj
 
 
 votingToTSE = VotingToTSE( CSVReader(CONGRESS_TO_TSE_FILE).readLines() )
 
 projects = CSVReader(PROJECTS_FILE).readLines()
 
+n4j = Neo4jPersistence()
 
 for project in projects:
+	n4j.createProjectNode(project[0], project[1], project[2], project[3])
+
 	fetcher = ProjectFetcher(project)
 	fetcher.fetchContent()
-	fetcher.parseVoting() 
+	votingObj = fetcher.parseVoting() 
 
-
-# n4j = Neo4jPersistence()
-
-# n4j.deleteAll()
-
-# for key, value in companiesObj.iteritems():
-# 	n4j.createCompanyNode(key, value)
-
-
-# for key, value in politiciansObj.iteritems():
-# 	n4j.createCongressmanNode(value['name'], 'Deputado Federal', value['party'], value['state'], value['total'])
-# 	for i in range( len(value['donators_ids']) ):
-# 		n4j.createDonation(value['name'], value['donators_ids'][i], value['donations_values'][i])
+	for key, value in votingObj.iteritems():
+		n4j.createVote(project[1], key, value)
 
