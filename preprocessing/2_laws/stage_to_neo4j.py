@@ -11,9 +11,6 @@ sys.path.append(os.path.join(os.getcwd(), '..'))
 import untangle, urllib2
 
 
-from datetime import datetime
-
-
 from config import PROJECTS_FILE, CONGRESS_URL, CONGRESS_TO_TSE_FILE
 
 
@@ -23,7 +20,7 @@ from persistence.csv import CSVReader
 from persistence.neo4j import Neo4jPersistence
 
 
-positions = { u'S': 'SIM', u'N': 'NÃO', u'A': 'ABSTENÇÃO' }
+positions = { u'S': 'SIM', u'N': 'NÃO', u'A': 'ABSTENÇÃO', u'O': 'ABSTENÇÃO' }
 
 
 class VotingToTSE():
@@ -38,7 +35,8 @@ class VotingToTSE():
 		try:
 			return self.map[votingName]
 		except KeyError as e:
-			print "Unable to find politician: ", e
+			print 'Unable to find politician: ', e
+
 
 
 class ProjectFetcher():
@@ -47,7 +45,8 @@ class ProjectFetcher():
 		self.pType = tokens[0]
 		self.pId = tokens[1]
 		self.year = tokens[2]
-		self.description = tokens[3]
+		self.subject = unicode(tokens[3].replace('\"','').decode('utf8'))
+		self.description = tokens[4]
 
 
 	def getURL(self):
@@ -58,21 +57,22 @@ class ProjectFetcher():
 		response = urllib2.urlopen(self.getURL())
 		self.contentObj = untangle.parse(response.read())
 
-		mostRecentVoting = None
-		mostRecentDate = datetime.strptime('31/12/2014', '%d/%m/%Y')
+		subjectVoting = None
 		for voting in self.contentObj.proposicao.Votacoes.Votacao:
-			date = datetime.strptime((voting['Data'] + ' ' + voting['Hora']), '%d/%m/%Y %H:%M')
-			if date > mostRecentDate:
-				mostRecentDate = date
-				mostRecentVoting = voting
+			if voting['ObjVotacao'] == self.subject:
+				subjectVoting = voting
+				break
 
-		self.votingObj = mostRecentVoting.votos
+		if not subjectVoting:
+			raise KeyError('Voting subject ' + self.subject + ' did not match any in ' + self.getURL())
+
+		self.voting = subjectVoting.votos
 
 
 	def parseVoting(self):
 		votingObj = dict()
 
-		for congressman in self.votingObj.Deputado:
+		for congressman in self.voting.Deputado:
 			name = congressman['Nome'].strip().encode('utf8', 'replace')
 			vote = congressman['Voto'][0]
 			votingObj[name] = positions[vote]
@@ -87,12 +87,17 @@ projects = CSVReader(PROJECTS_FILE).readLines()
 n4j = Neo4jPersistence()
 
 for project in projects:
-	n4j.createProjectNode(project[0], project[1], project[2], project[3])
+	pType = project[0]
+	pId = project[1]
+	year = project[2]
+	subject = project[3]
+	description = project[4]
+	n4j.createProjectNode(pType, pId, year, subject, description)
 
 	fetcher = ProjectFetcher(project)
 	fetcher.fetchContent()
 	votingObj = fetcher.parseVoting() 
 
 	for key, value in votingObj.iteritems():
-		n4j.createVote(project[1], key, value)
+		n4j.createVote(pId, subject, key, value)
 

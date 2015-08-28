@@ -4,16 +4,17 @@
 
 class Project(object):
 
-	def __init__(self, pType=None, pId=None, year=None, description=None):
+	def __init__(self, pType=None, pId=None, year=None, subject=None, description=None):
 		self.type = pType
 		self.pId = pId
 		self.year = year
+		self.subject = subject
 		self.description = description
 
 
 	def toCypher(self):
-		return "CREATE (project:Projects { pType: '%s', pId: '%s', \
-				year: '%s', description: '%s' })" % (self.type, self.pId, self.year, self.description)
+		return "CREATE (project:Projects { pType: '%s', pId: '%s', year: '%s', \
+				subject: '%s', description: '%s' })" % (self.type, self.pId, self.year, self.subject, self.description)
 
 
 class Congressman(object):

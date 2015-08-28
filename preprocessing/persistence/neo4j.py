@@ -20,8 +20,8 @@ class Neo4jPersistence():
 		self.graph.cypher.execute(query)
 
 
-	def createProjectNode(self, pType, pId, year, description):	
-		newProjectNode = Project(pType=pType, pId=pId, year=year, description=description)
+	def createProjectNode(self, pType, pId, year, subject, description):	
+		newProjectNode = Project(pType=pType, pId=pId, year=year, subject=subject, description=description)
 		self.graph.cypher.execute(newProjectNode.toCypher())
 
 
@@ -40,10 +40,10 @@ class Neo4jPersistence():
 		self.graph.cypher.execute(newProductNode.toCypher())
 
 	
-	def createVote(self, pId, name, position):
+	def createVote(self, pId, subject, name, position):
 		name = name.replace('\'','') # Sanitizing so it doesn't break Cypher
-		query = "MATCH (project:Projects { pId: '%s' }), (congressman:Congressmen { name: '%s' }) \
-				CREATE (congressman)-[:VOTES { position: '%s' }]->(project)" % (pId, name, position)
+		query = "MATCH (project:Projects { pId: '%s', subject: '%s' }), (congressman:Congressmen { name: '%s' }) \
+				CREATE (congressman)-[:VOTES { position: '%s' }]->(project)" % (pId, subject, name, position)
 		self.graph.cypher.execute(query)
 
 
@@ -60,7 +60,7 @@ class Neo4jPersistence():
 		self.graph.cypher.execute(query)
 
 
-	def readTopInfluencers(self, pIdStr, positionStr):
+	def readTopInfluencers(self, pIdStr, subjectStr, positionStr):
 		query =  "MATCH (project { pId: '171' })<-[r1 {position: 'SIM'}]-(congressman)"
 		query += "<-[r2:DONATES]-(company)-[r3:SELLS]->(product)"
 		query += " RETURN company.name, sum(r2.value / congressman.total) as total_donation, product.name, product.alternative"
