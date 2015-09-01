@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
+from collections import OrderedDict
+
+
 from py2neo import ServiceRoot
 
 
@@ -11,7 +14,7 @@ from models import Project, Congressman, Company, Product
 class Neo4jPersistence():
 
 	def __init__(self):
-		neo4jUri = "http://localhost:7474/"
+		neo4jUri = 'http://localhost:7474/'
 		self.graph = ServiceRoot(neo4jUri).graph
 
 
@@ -60,21 +63,20 @@ class Neo4jPersistence():
 		self.graph.cypher.execute(query)
 
 
-	def readTopInfluencers(self, pIdStr, subjectStr, positionStr):
-		query =  "MATCH (project { pId: '171' })<-[r1 {position: 'SIM'}]-(congressman)"
-		query += "<-[r2:DONATES]-(company)-[r3:SELLS]->(product)"
-		query += " RETURN company.name, sum(r2.value / congressman.total) as total_donation, product.name, product.alternative"
-		query += " ORDER BY total_donation DESC"
+	def readTopInfluencers(self, pId, subject, position):
+		query =  "MATCH (project:Projects { pId: '%s', subject: '%s' })<-[vote:VOTES]-(congressman:Congressmen)" % (pId, subject)
+		query += "<-[donation:DONATES]-(company:Companies) "
+		query += "WHERE ((donation.value / congressman.total) >= 0.05) AND vote.position <> 'ABSTENÇÃO' "
+		query += "WITH company.name AS name, collect(vote.position = '%s') AS in_favor " % (position)
+		query += "RETURN name, length([x IN in_favor WHERE x = true]) - length([x IN in_favor WHERE x = false]) AS prominent_position "
+		query += "ORDER BY prominent_position DESC"
 
-		results = dict()
+		results = OrderedDict()
 		for record in self.graph.cypher.execute(query):
-			company = record["company.name"]
-			donation = record["total_donation"]
-			product = record["product.name"]
-			alternative = record["product.alternative"]
+			company = record["name"].replace('.','')
+			score = record["prominent_position"]
 
-			if company not in results:
-				results[company] = list()
-			
-			results[company].append({ "value" : donation, "product" : product, "alternative" : alternative})
-		return str(results)
+			results[company] = score
+
+		return results
+

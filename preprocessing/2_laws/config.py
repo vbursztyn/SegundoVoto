@@ -6,6 +6,7 @@
 # 2. An URL from which we may fetch voting data;
 # 3. FROM VotingName TO TSEName: a dictionary that makes data integration possible.
 
+
 PROJECTS_FILE = 'data/targeted_projects.csv'
 
 CONGRESS_URL = 'http://www.camara.gov.br/SitCamaraWS/Proposicoes.asmx/ObterVotacaoProposicao?tipo=%s&numero=%s&ano=%s'

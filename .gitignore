@@ -1,4 +1,5 @@
 preprocessing/etl_venv
+preprocessing/config_prod.py
 preprocessing/1_politicians/pig_output
 preprocessing/1_politicians/raw_candidates
 preprocessing/1_politicians/raw_donations
