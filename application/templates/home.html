@@ -1,0 +1,36 @@
+<html>
+<head>
+	<meta charset='utf-8'>
+	<title>SegundoVoto.com.br - Ficou fácil alinhar o seu consumo a seus posicionamentos.</title>
+	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css'>
+	<link rel='stylesheet' type='text/css' href='static/css/style.css'>
+</head>
+<body>
+<form action="{{ url_for('processVotes') }}" method="POST">
+	<div class='jumbotron'>
+		<h1>Segundo Voto</h1>
+		<p>Ficou fácil alinhar o seu consumo a seus posicionamentos.</p>
+	</div>
+	<div class='panel panel-default'>
+		<div class='panel-heading'>Faça a sua própria votação e depois clique em "Alinhar o consumo":</div>
+  		<div class='panel-body'>
+			<ul class='list-group'>
+			{% for item in items %}
+				<li class='list-group-item'>
+					<span class='badge'>{{ item.pType }}-{{ item.pId }} ({{ item.year }})</span>
+					{{ item.description|safe }}
+					<fieldset>
+						<input type="radio" name="{{ item.pType }}-{{ item.pId }}-{{ item.year }}-{{ item.subject }}" value="SIM" />Sim
+						<input type="radio" name="{{ item.pType }}-{{ item.pId }}-{{ item.year }}-{{ item.subject }}" value="NÃO" />Não
+						<input type="radio" name="{{ item.pType }}-{{ item.pId }}-{{ item.year }}-{{ item.subject }}" value="ABSTENÇÃO" checked />Indiferente
+					</fieldset>
+				</li>
+			{% endfor %}
+			</ul>
+			<input type="submit" value="Alinhar o consumo" />
+		</div>
+	</div>
+</form>
+</body>
+</html>
