@@ -40,8 +40,9 @@ class MongoPersistence():
 
 		for result in collection.find({ 'pType': pType, 'pId': pId, 'year': year, \
 										'subject': subject, 'position' : position }):
-			for company, score in result['results'].iteritems():
-				results[company] = int(score)
+			for company, values in result['results'].iteritems():
+				results[company] = { 'in_favor_count': int(values['in_favor_count']), \
+									'against_count': int(values['against_count']), 'score': int(values['score']) }
 
 		return results
 

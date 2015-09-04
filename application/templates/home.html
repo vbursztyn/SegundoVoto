@@ -3,14 +3,20 @@
 	<meta charset='utf-8'>
 	<title>SegundoVoto.com.br - Ficou fácil alinhar o seu consumo a seus posicionamentos.</title>
 	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
-	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css'>
 	<link rel='stylesheet' type='text/css' href='static/css/style.css'>
 </head>
 <body>
+<a href="https://github.com/vbursztyn/SegundoVoto"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
 <form action="{{ url_for('processVotes') }}" method="POST">
 	<div class='jumbotron'>
 		<h1>Segundo Voto</h1>
-		<p>Ficou fácil alinhar o seu consumo a seus posicionamentos.</p>
+		<div class='disclaimer'>
+			<p>Você sabia que as <b>10 empresas</b> que mais doaram em 2014 ajudaram a eleger <b>70% da Câmara</b>?</p>
+			<p>Em resposta ao crescente interesse da população pelo fim do financiamento privado nas campanhas políticas - com resistência justamente da Câmara -, integramos os dados abertos para criar esta ferramenta. Com ela, ficou fácil alinhar o seu consumo a seus posicionamentos sobre as leis votadas pelos mesmos deputados.</p>
+		</div>
+		<div class='graph'>
+			<img src='static/img/graph.png' />
+		</div>
 	</div>
 	<div class='panel panel-default'>
 		<div class='panel-heading'>Faça a sua própria votação e depois clique em "Alinhar o consumo":</div>
@@ -28,7 +34,7 @@
 				</li>
 			{% endfor %}
 			</ul>
-			<input type="submit" value="Alinhar o consumo" />
+			<div class='submit-wrapper'><input type="submit" value="Alinhar o consumo" /></div>
 		</div>
 	</div>
 </form>

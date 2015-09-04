@@ -68,15 +68,19 @@ class Neo4jPersistence():
 		query += "<-[donation:DONATES]-(company:Companies) "
 		query += "WHERE ((donation.value / congressman.total) >= 0.05) AND vote.position <> 'ABSTENÇÃO' "
 		query += "WITH company.name AS name, collect(vote.position = '%s') AS in_favor " % (position)
-		query += "RETURN name, length([x IN in_favor WHERE x = true]) - length([x IN in_favor WHERE x = false]) AS prominent_position "
+		query += "RETURN name, length([x IN in_favor WHERE x = true]) AS in_favor_count,"
+		query += "length([x IN in_favor WHERE x = false]) AS against_count,"
+		query += "length([x IN in_favor WHERE x = true]) - length([x IN in_favor WHERE x = false]) AS prominent_position "
 		query += "ORDER BY prominent_position DESC"
 
 		results = OrderedDict()
 		for record in self.graph.cypher.execute(query):
-			company = record["name"].replace('.','')
-			score = record["prominent_position"]
+			company = record['name'].replace('.','')
+			in_favor_count = record['in_favor_count']
+			against_count = record['against_count']
+			score = record['prominent_position']
 
-			results[company] = score
+			results[company] = { 'in_favor_count' : in_favor_count, 'against_count' : against_count, 'score' : score }
 
 		return results
 

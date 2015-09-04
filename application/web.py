@@ -36,7 +36,7 @@ def processVotes():
 	allResults = getResults(validUserVotes)
 	condensedResults = processResults(allResults)
 
-	return str(condensedResults[:30])
+	return render_template('results.html', results=condensedResults[:30])
 
 
 def getResults(validUserVotes):
@@ -62,13 +62,16 @@ def processResults(allResults):
 	condensedResults = dict()
 
 	for project, result in allResults.iteritems():
-		for company, score in result.iteritems():
+		for company, values in result.iteritems():
 			if company not in condensedResults:
-				condensedResults[company] = score
+				condensedResults[company] = { 'score': values['score'], 'in_favor_count': values['against_count'], \
+											'against_count': values['in_favor_count'] }
 			else:
-				condensedResults[company] += score
+				condensedResults[company]['score'] += values['score']
+				condensedResults[company]['against_count'] += values['in_favor_count']
+				condensedResults[company]['in_favor_count'] += values['against_count']
 
-	condensedResults = sorted(condensedResults.items(), key=lambda x: x[1], reverse=True)
+	condensedResults = sorted(condensedResults.items(), key=lambda x: x[1]['score'], reverse=True)
 	return condensedResults
 
 

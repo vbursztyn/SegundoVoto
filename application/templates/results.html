@@ -1,0 +1,62 @@
+<html>
+<head>
+	<meta charset='utf-8'>
+	<title>SegundoVoto.com.br - Ficou fácil alinhar o seu consumo a seus posicionamentos.</title>
+	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+	<link rel='stylesheet' type='text/css' href='static/css/style.css'>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/d3plus/1.8.0/d3plus.full.js'></script>
+</head>
+<body>
+<div class='panel panel-default'>
+	<div class='panel-heading'>Confira as empresas a serem evitadas para alinhar o seu consumo a seus posicionamentos:</div>
+ 	<div class='panel-body results-body'>
+		<h3>Top 30: &Sigma;(Doações para votos contrários) - &Sigma;(Doações para votos iguais aos seus)</h3>
+		<p>*Desconsiderando participações muito pequenas, isto é, doações inferiores a 5% das campanhas que as receberam.</p>
+		<div id='viz_diff'></div>
+		<hr/>
+		<h3>Top 30: &Sigma;(Doações para votos contrários)</h3>
+		<div id='viz_against'></div>
+		<hr/>
+		<h3>Top 30: &Sigma;(Doações para votos iguais aos seus)</h3>
+		<div id='viz_in_favor'></div>
+		<script>
+		var data_diff = new Array();
+		var data_in_favor = new Array();
+		var data_against = new Array();
+		{% for result in results %}
+		data_diff[ {{ loop.index0 }} ] = { 'Empresa' : '{{ result[0] }}', 'Diferença entre Votos Contrários e Iguais' : {{ result[1]['score'] }} };
+		data_in_favor[ {{ loop.index0 }} ] = { 'Empresa' : '{{ result[0] }}', 'Total de Votos Contrários' : {{ result[1]['against_count'] }} };
+		data_against[ {{ loop.index0 }} ] = { 'Empresa' : '{{ result[0] }}', 'Total de Votos Iguais' : {{ result[1]['in_favor_count'] }} };
+		{% endfor %}
+
+		var visualization_1 = d3plus.viz()
+							.container('#viz_diff')
+							.data(data_diff)
+							.type('bar')
+							.id('Empresa')
+							.x('Empresa')
+							.y('Diferença entre Votos Contrários e Iguais')
+							.draw();
+
+		var visualization_2 = d3plus.viz()
+							.container('#viz_against')
+							.data(data_in_favor)
+							.type('bar')
+							.id('Empresa')
+							.x('Empresa')
+							.y('Total de Votos Contrários')
+							.draw();
+
+		var visualization_3 = d3plus.viz()
+							.container('#viz_in_favor')
+							.data(data_against)
+							.type('bar')
+							.id('Empresa')
+							.x('Empresa')
+							.y('Total de Votos Iguais')
+							.draw();
+		</script>
+	</div>
+</div>
+</body>
+</html>
