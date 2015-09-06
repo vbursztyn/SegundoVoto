@@ -1,16 +1,16 @@
 # pType;pId;year;subject;description
-PEC;171;1993;"SUBSTITUTIVO DA COMISSÃO ESPECIAL";"redução da maioridade penal (1ª votação)?"
-PEC;171;1993;"REQ. DE PREFERÊNCIA PARA A EMENDA AGLUTINATIVA Nº 16";"redução da maioridade penal (2ª votação - excluindo tráfico de drogas e roubo qualificado)?"
-PEC;182;2007;"EMENDA AGLUTINATIVA Nº 28";"financiamento privado de campanhas só para partidos políticos?"
-PEC;182;2007;"EMENDA AGLUTINATIVA Nº 22";"financiamento privado de campanhas para partidos políticos e candidatos?"
-PL;4330;2004;"SUBEMENDA SUBSTITUTIVA";"emenda da terceirização?"
-PEC;182;2007;"ART. 1º DO SUBSTITUTIVO";"sistema de voto Distritão?"
-PL;4148;2008;"SUBEMENDA SUBSTITUTIVA DA CDEIC";"retirada das embalagens o aviso de produto transgênico?"
-PEC;182;2007;"ARTIGO 3º DO SUBSTITUTIVO - FIM DA REELEIÇÃO";"fim da reeleição?"
-PEC;182;2007;"EMENDA AGLUTINATIVA Nº 57";"cota para mulheres no legislativo?"
-MPV;664;2014;"PROJETO DE LEI DE CONVERSÃO";"restrição de acesso a pensão por morte?"
-MPV;665;2014;"PROJETO DE LEI DE CONVERSÃO";"endurecimento do acesso ao seguro-desemprego?"
-PEC;182;2007;"EMENDA AGLUTINATIVA Nº 48";"tempo de mandato de 5 anos?"
-# PEC;182;2007;"ARTIGO 8º DO SUBSTITUTIVO - VOTO FACULTATIVO";"voto facultativo?"
-PEC;182;2007;"EMENDA AGLUTINATIVA Nº 60";"voto impresso?"
-PEC;182;2007;"EMENDA AGLUTINATIVA Nº 54";"coincidência da eleição?"
+PEC;171;1993;"SUBSTITUTIVO DA COMISSÃO ESPECIAL";Redução da maioridade penal (1ª votação - Reduz maioridade idade penal de 18 para 16 anos)?
+PEC;171;1993;"REQ. DE PREFERÊNCIA PARA A EMENDA AGLUTINATIVA Nº 16";Redução da maioridade penal (2ª votação - Reduz maioridade idade penal de 18 para 16 anos para homicídio doloso e crimes hediondos)?"
+PEC;182;2007;"EMENDA AGLUTINATIVA Nº 28";Permite financiamento privado de campanhas somente para partidos políticos?
+PEC;182;2007;"EMENDA AGLUTINATIVA Nº 22";Permite financiamento privado de campanhas para partidos políticos e candidatos?
+PL;4330;2004;"SUBEMENDA SUBSTITUTIVA";Permite terceirização da ativide-fim das empresas?
+PEC;182;2007;"ART. 1º DO SUBSTITUTIVO";Sistema de voto distritão?
+PL;4148;2008;"SUBEMENDA SUBSTITUTIVA DA CDEIC";Retirada do aviso de produto transgênicodas nas embalagens?
+PEC;182;2007;"ARTIGO 3º DO SUBSTITUTIVO - FIM DA REELEIÇÃO";Fim da reeleição para cargos no executivo?
+PEC;182;2007;"EMENDA AGLUTINATIVA Nº 57";Cotas para mulheres no legislativo?
+MPV;664;2014;"PROJETO DE LEI DE CONVERSÃO";Restrição de acesso a pensão por morte?
+MPV;665;2014;"PROJETO DE LEI DE CONVERSÃO";Endurecimento do acesso ao seguro-desemprego?
+PEC;182;2007;"EMENDA AGLUTINATIVA Nº 48";Mandatos com duração de 5 anos?
+# PEC;182;2007;"ARTIGO 8º DO SUBSTITUTIVO - VOTO FACULTATIVO";Voto facultativo?
+PEC;182;2007;"EMENDA AGLUTINATIVA Nº 60";Comprovante impresso de votação?
+PEC;182;2007;"EMENDA AGLUTINATIVA Nº 54";Coincidência entre os anos das eleições municipais e gerais?
