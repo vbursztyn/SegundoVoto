@@ -65,7 +65,7 @@ class Neo4jPersistence():
 
 	def readTopInfluencers(self, pId, subject, position):
 		# Since the influences we are looking for are the ones when opposers outweigh allies,
-		# we set up the score with allies count, subtract opposers count, then sort it in descending order.
+		# we set up the score with minus allies count, add opposers count, then sort it in descending order.
 		results = dict()
 		oppositePosition = { 'SIM': 'NÃO', 'NÃO': 'SIM' }
 
