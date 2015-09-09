@@ -11,6 +11,9 @@ import os
 import pymongo
 
 
+import json
+
+
 class MongoPersistence():
 
 	def __init__(self, collection):
@@ -42,9 +45,27 @@ class MongoPersistence():
 										'subject': subject, 'position' : position }):
 			for company, values in result['results'].iteritems():
 				results[company] = { 'in_favor_count': int(values['in_favor_count']), \
-									'against_count': int(values['against_count']), 'score': int(values['score']) }
+									'against_count': int(values['against_count']) }
 
 		return results
+
+
+	def getProjectDetails(self, pType, pId, year, subject, position):
+		collection = self.db[self.collectionName]
+		results = dict()
+
+		for result in collection.find({ 'pType': pType, 'pId': pId, 'year': year, \
+										'subject': subject, 'position' : position }):
+			for company, congressmen in result['details'].iteritems():
+				results[company] = congressmen
+
+		return json.dumps(results, indent=4)
+
+
+	def getDescription(self, pType, pId, year, subject):
+		collection = self.db[self.collectionName]
+		return json.dumps(collection.find_one({ 'pType': pType, 'pId': pId, 'year': year, \
+												'subject': subject })['description'])
 
 
 	def close(self):

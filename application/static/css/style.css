@@ -21,7 +21,7 @@ body {
 .jumbotron .disclaimer {
 	margin-right: 16%;
 	margin-left: 16%;
-	width: 70%%;
+	width: 70%;
 	vertical-align: top;
 	display: inline-block;
 }
@@ -31,16 +31,15 @@ body {
 }
 
 .jumbotron .graph {
-	margin-right: 10%;
-	margin-left: 2%;
-	width: 20%;
+	margin-right: 30%;
+	margin-left: 30%;
 	vertical-align: top;
-	display: none;
+	display: block;
 }
 
 .jumbotron img {
-	width: 360px;
-	height: 250px;
+	width: 450px;
+	height: 160px;
 }
 
 .submit-wrapper {

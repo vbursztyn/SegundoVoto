@@ -65,7 +65,7 @@ class Neo4jPersistence():
 
 	def readTopInfluencers(self, pId, subject, position):
 		# Since the influences we are looking for are the ones when opposers outweigh allies,
-		# we set up the score with minus allies count, add opposers count, then sort it in descending order.
+		# we sort according to this criteria.
 		results = dict()
 		oppositePosition = { 'SIM': 'NÃO', 'NÃO': 'SIM' }
 
@@ -77,7 +77,7 @@ class Neo4jPersistence():
 		for record in self.graph.cypher.execute(query):
 			company = record['company_name'].replace('.','')
 			in_favor_count = record['score']
-			results[company] = { 'in_favor_count' : in_favor_count, 'against_count' : 0, 'score' : (in_favor_count * (-1)) }
+			results[company] = { 'in_favor_count' : in_favor_count, 'against_count' : 0 }
 
 		query =  "MATCH (project:Projects { pId: '%s', subject: '%s' })<-[vote:VOTES { position: '%s' }]-" % (pId, subject, oppositePosition[position])
 		query += "(congressman:Congressmen)<-[donation:DONATES]-(company:Companies)"
@@ -88,12 +88,11 @@ class Neo4jPersistence():
 			company = record['company_name'].replace('.','')
 			against_count = record['score']
 			if company not in results:
-				results[company] = { 'in_favor_count' : 0, 'against_count' : against_count, 'score' : against_count }
+				results[company] = { 'in_favor_count' : 0, 'against_count' : against_count }
 			else:
 				results[company]['against_count'] = against_count
-				results[company]['score'] += against_count
 
-		return OrderedDict( sorted(results.items(), key=lambda x: x[1]['score'], reverse=True) )
+		return OrderedDict( sorted(results.items(), key=lambda x: (x[1]['against_count'] - x[1]['in_favor_count']), reverse=True) )
 
 
 	def readTopInfluencersDetails(self, pId, subject, position):

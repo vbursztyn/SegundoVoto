@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 
 
 from werkzeug.datastructures import ImmutableMultiDict
@@ -23,8 +23,11 @@ def viewHome():
 	return render_template('home.html', items=interfaceItems)
 
 
-@app.route('/results', methods=['POST'])
-def processVotes():
+@app.route('/results', methods=['GET', 'POST'])
+def viewResults():
+	if request.method == 'GET':
+		return redirect(url_for('viewHome'))
+
 	formVotes = request.form	
 	validUserVotes = dict()
 
@@ -36,7 +39,7 @@ def processVotes():
 	allResults = getResults(validUserVotes)
 	condensedResults = processResults(allResults)
 
-	return render_template('results.html', results=condensedResults[:30])
+	return render_template('results.html', results=condensedResults[:30], votings=validUserVotes)
 
 
 def getResults(validUserVotes):
@@ -48,7 +51,7 @@ def getResults(validUserVotes):
 		pType = tokens[0]
 		pId = tokens[1]
 		year = tokens[2]
-		subject = tokens[3]
+		subject = '-'.join(tokens[3:])
 
 		allResults[project] = mdb.getResult(pType, pId, year, subject, position)
 
@@ -61,16 +64,39 @@ def processResults(allResults):
 
 	for project, result in allResults.iteritems():
 		for company, values in result.iteritems():
+			score = values['against_count'] - values['in_favor_count']
 			if company not in condensedResults:
-				condensedResults[company] = { 'score': values['score'], 'in_favor_count': values['in_favor_count'], \
+				condensedResults[company] = { 'score': score, 'in_favor_count': values['in_favor_count'], \
 											'against_count': values['against_count'] }
 			else:
-				condensedResults[company]['score'] += values['score']
+				condensedResults[company]['score'] += score
 				condensedResults[company]['against_count'] += values['against_count']
 				condensedResults[company]['in_favor_count'] += values['in_favor_count']
 
 	condensedResults = sorted(condensedResults.items(), key=lambda x: x[1]['score'], reverse=True)
 	return condensedResults
+
+
+@app.route('/details/<project>/<position>', methods=['GET'])
+def getDetails(project, position):
+	mdb = MongoPersistence('details')
+	tokens = project.split('-')
+	pType, pId, year, subject = tokens[0], tokens[1], tokens[2], '-'.join(tokens[3:])
+	projectDetails = mdb.getProjectDetails(pType, pId, year, subject, position)
+	mdb.close()
+
+	return projectDetails
+
+
+@app.route('/details/<project>', methods=['GET'])
+def getDescription(project):
+	mdb = MongoPersistence('interface')
+	tokens = project.split('-')
+	pType, pId, year, subject = tokens[0], tokens[1], tokens[2], '-'.join(tokens[3:])
+	description = mdb.getDescription(pType, pId, year, subject)
+	mdb.close()
+
+	return description
 
 
 if __name__ == "__main__":

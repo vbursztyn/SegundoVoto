@@ -5,6 +5,7 @@
 	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
 	<link rel='stylesheet' type='text/css' href='static/css/style.css'>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/d3plus/1.8.0/d3plus.full.js'></script>
+	<script src='https://code.jquery.com/jquery-2.1.4.min.js'></script>
 </head>
 <body>
 <div class='panel panel-default'>
@@ -19,6 +20,7 @@
 		<hr/>
 		<h3>Total de apoio a favor dos seus posicionamentos</h3>
 		<div id='viz_in_favor'></div>
+		<hr/>
 		<script>
 		var data_diff = new Array();
 		var data_in_favor = new Array();
@@ -55,6 +57,109 @@
 							.x('Empresa')
 							.y('Total de Votos Iguais')
 							.draw();
+		</script>
+		<h3>Detalhes por projeto</h3>
+		<p>Selecione entre os projetos em que você votou:</p>
+		<select class='form-control' id='project_selector'>
+			{% for project,position in votings.iteritems() %}
+			<option>{{ project }} (Você votou: {{ position }})</option>
+			{% endfor %}
+		</select>
+		<hr/>
+		<div id='project_details'/>
+		<script>			
+		function parseProject() {
+			var project = $('#project_selector option:selected').text().split(' ');
+			project = project.slice(0, project.length - 3).join().replace(/,/g,' ');
+			return project;
+		}
+
+		function parsePosition() {
+			var position = $('#project_selector option:selected').text().split(' ');
+			position = position.slice(position.length - 1, position.length)[0].slice(0, -1);
+			return position;
+		}
+
+		function clearProject() {
+			$('#project_details').html('');
+		}
+
+		function updateProject() {
+			$.ajax({
+				type : 'GET',
+				url : '/details/' + parseProject(),
+				dataType : 'json',
+				success: function(description) {
+					description = '<h4>' + description + '</h4>';
+					$('#project_details').append(description);
+				}
+			});
+
+			var position = parsePosition();
+			var oppositePositions = { 'SIM': 'NÃO', 'NÃO': 'SIM' };
+
+			var content = new Object();
+			var table = '<table class="table table-striped">';
+			table += '<thead><tr><th>Empresa</th><th>' + position + ' (Voto Igual)</th><th>' + oppositePositions[position] + ' (Voto Contrário)</th></tr></thead><tbody style="font:Semibold 12px;">';
+
+			$.ajax({
+				type : 'GET',
+				url : '/details/' + parseProject() + '/' + position,
+				dataType : 'json',
+				success: function(in_favor_array) {
+					for (var company in in_favor_array) {
+						content[company] = new Object();
+
+						var in_favor_str = in_favor_array[company].join(', ');
+						content[company][position] = in_favor_str;
+					}
+
+					var opposite = oppositePositions[position];
+					$.ajax({
+						type : 'GET',
+						url : '/details/' + parseProject() + '/' + opposite,
+						dataType : 'json',
+						success: function(against_array) {
+							for (var company in against_array) {
+								if (!content[company]) {
+									content[company] = new Object();
+								}
+
+								var against_str = against_array[company].join(', ');
+								content[company][opposite] = against_str;
+							}
+
+							// TO-DO: Sorting goes here.
+
+							for (var company in content) {
+								table += '<tr>';
+								if (content[company][position]) {
+									table += '<th>' + company + '</th><th>' + content[company][position] + '</th>';	
+								} else {
+									table += '<th>' + company + '</th><th>-</th>';
+								}
+								if (content[company][opposite]) {
+									table += '<th>' + content[company][opposite] + '</th>';
+								} else {
+									table += '<th>-</th>';
+								}
+								table += '</tr>'
+							}
+							table += '</tbody></table>'
+							$('#project_details').append(table);
+						}
+					});
+
+				}
+			});	
+		}
+
+		$('#project_selector').change( function() {
+			clearProject();
+			updateProject();
+		});
+
+		updateProject();
 		</script>
 	</div>
 </div>
