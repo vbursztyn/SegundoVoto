@@ -64,23 +64,50 @@ class Neo4jPersistence():
 
 
 	def readTopInfluencers(self, pId, subject, position):
-		query =  "MATCH (project:Projects { pId: '%s', subject: '%s' })<-[vote:VOTES]-(congressman:Congressmen)" % (pId, subject)
-		query += "<-[donation:DONATES]-(company:Companies) "
-		query += "WHERE ((donation.value / congressman.total) >= 0.05) AND vote.position <> 'ABSTENÇÃO' "
-		query += "WITH company.name AS name, collect(vote.position = '%s') AS in_favor " % (position)
-		query += "RETURN name, length([x IN in_favor WHERE x = true]) AS in_favor_count,"
-		query += "length([x IN in_favor WHERE x = false]) AS against_count,"
-		query += "length([x IN in_favor WHERE x = true]) - length([x IN in_favor WHERE x = false]) AS prominent_position "
-		query += "ORDER BY prominent_position DESC"
+		# Since the influences we are looking for are the ones when opposers outweigh allies,
+		# we set up the score with allies count, subtract opposers count, then sort it in descending order.
+		results = dict()
+		oppositePosition = { 'SIM': 'NÃO', 'NÃO': 'SIM' }
 
-		results = OrderedDict()
+		query =  "MATCH (project:Projects { pId: '%s', subject: '%s' })<-[vote:VOTES { position: '%s' }]-" % (pId, subject, position)
+		query += "(congressman:Congressmen)<-[donation:DONATES]-(company:Companies)"
+		query += " WITH SUM(donation.value) AS company_donations, company.name AS company_name, congressman.name AS congressman_name, congressman.total AS total"
+		query += " WHERE (company_donations / total >= 0.05) RETURN company_name, COUNT(DISTINCT congressman_name) AS score ORDER BY score DESC"
+
 		for record in self.graph.cypher.execute(query):
-			company = record['name'].replace('.','')
-			in_favor_count = record['in_favor_count']
-			against_count = record['against_count']
-			score = record['prominent_position']
+			company = record['company_name'].replace('.','')
+			in_favor_count = record['score']
+			results[company] = { 'in_favor_count' : in_favor_count, 'against_count' : 0, 'score' : (in_favor_count * (-1)) }
 
-			results[company] = { 'in_favor_count' : in_favor_count, 'against_count' : against_count, 'score' : score }
+		query =  "MATCH (project:Projects { pId: '%s', subject: '%s' })<-[vote:VOTES { position: '%s' }]-" % (pId, subject, oppositePosition[position])
+		query += "(congressman:Congressmen)<-[donation:DONATES]-(company:Companies)"
+		query += " WITH SUM(donation.value) AS company_donations, company.name AS company_name, congressman.name AS congressman_name, congressman.total AS total"
+		query += " WHERE (company_donations / total >= 0.05) RETURN company_name, COUNT(DISTINCT congressman_name) AS score ORDER BY score DESC"
+
+		for record in self.graph.cypher.execute(query):
+			company = record['company_name'].replace('.','')
+			against_count = record['score']
+			if company not in results:
+				results[company] = { 'in_favor_count' : 0, 'against_count' : against_count, 'score' : against_count }
+			else:
+				results[company]['against_count'] = against_count
+				results[company]['score'] += against_count
+
+		return OrderedDict( sorted(results.items(), key=lambda x: x[1]['score'], reverse=True) )
+
+
+	def readTopInfluencersDetails(self, pId, subject, position):
+		results = dict()
+
+		query = "MATCH (project:Projects { pId: '%s', subject: '%s' })<-[vote:VOTES { position: '%s' }]-" % (pId, subject, position)
+		query += "(congressman:Congressmen)<-[donation:DONATES]-(company:Companies)"
+		query += " WITH SUM(donation.value) AS company_donations, company.name AS company_name, (congressman.name + ' - ' + congressman.party) AS congressman_name, congressman.total AS total"
+		query += " WHERE (company_donations / total >= 0.05) RETURN company_name, COLLECT(DISTINCT congressman_name) AS congressmen"
+
+		for record in self.graph.cypher.execute(query):
+			company = record['company_name'].replace('.','')
+			details = record['congressmen']
+			results[company] = details
 
 		return results
 

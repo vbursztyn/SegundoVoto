@@ -41,6 +41,16 @@ class MongoPersistence():
 			raise ValueError('Could not register result to results collection: missing core data')
 
 
+	def createTopInfluencersDetails(self, pType=None, pId=None, year=None, subject=None, position=None, details=None):
+		if all([ pType, pId, year, subject, position, details ]):
+			collection = self.db[self.collectionName]
+			saveObj = { 'pType' : pType, 'pId' : pId, 'year' : year, \
+					 'subject' : subject, 'position' : position, 'details' : details }
+			collection.save(saveObj)
+		else:
+			raise ValueError('Could not register result to results collection: missing core data')
+
+
 	def close(self):
 		self.client.close()
 

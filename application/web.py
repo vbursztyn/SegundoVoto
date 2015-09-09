@@ -43,8 +43,6 @@ def getResults(validUserVotes):
 	mdb = MongoPersistence('results')
 	allResults = dict()
 
-	oppositePosition = { u'SIM': u'NÃO', u'NÃO': u'SIM' }
-
 	for project, position in validUserVotes.iteritems():
 		tokens = project.split('-')
 		pType = tokens[0]
@@ -52,7 +50,7 @@ def getResults(validUserVotes):
 		year = tokens[2]
 		subject = tokens[3]
 
-		allResults[project] = mdb.getResult(pType, pId, year, subject, oppositePosition[position])
+		allResults[project] = mdb.getResult(pType, pId, year, subject, position)
 
 	mdb.close()
 	return allResults
@@ -64,12 +62,12 @@ def processResults(allResults):
 	for project, result in allResults.iteritems():
 		for company, values in result.iteritems():
 			if company not in condensedResults:
-				condensedResults[company] = { 'score': values['score'], 'in_favor_count': values['against_count'], \
-											'against_count': values['in_favor_count'] }
+				condensedResults[company] = { 'score': values['score'], 'in_favor_count': values['in_favor_count'], \
+											'against_count': values['against_count'] }
 			else:
 				condensedResults[company]['score'] += values['score']
-				condensedResults[company]['against_count'] += values['in_favor_count']
-				condensedResults[company]['in_favor_count'] += values['against_count']
+				condensedResults[company]['against_count'] += values['against_count']
+				condensedResults[company]['in_favor_count'] += values['in_favor_count']
 
 	condensedResults = sorted(condensedResults.items(), key=lambda x: x[1]['score'], reverse=True)
 	return condensedResults

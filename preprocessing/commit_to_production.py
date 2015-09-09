@@ -4,7 +4,7 @@
 # IMPORTANT: to be executed from bash file
 
 
-from config import PRODUCTION_MONGODB, PROJECTS_FILE, PROJECTS_COLLECTION, INFLUENCERS_COLLECTION
+from config import PRODUCTION_MONGODB, PROJECTS_FILE, PROJECTS_COLLECTION, INFLUENCERS_COLLECTION, DETAILS_COLLECTION
 
 
 from persistence.mongodb import MongoPersistence
@@ -24,6 +24,9 @@ mdbInterface.deleteAll()
 mdbResults = MongoPersistence(PRODUCTION_MONGODB, INFLUENCERS_COLLECTION)
 mdbResults.deleteAll()
 
+mdbDetails = MongoPersistence(PRODUCTION_MONGODB, DETAILS_COLLECTION)
+mdbDetails.deleteAll()
+
 projects = CSVReader(PROJECTS_FILE).readLines()
 
 
@@ -38,9 +41,13 @@ for project in projects:
 	for position in ['SIM', 'NÃO']:
 		results = n4j.readTopInfluencers(pId, subject, position)
 		mdbResults.createTopInfluencers(pType, pId, year, subject, position, results)
+		details = n4j.readTopInfluencersDetails(pId, subject, position)
+		mdbDetails.createTopInfluencersDetails(pType, pId, year, subject, position, details)
 
 
 mdbInterface.close()
 
 mdbResults.close()
+
+mdbDetails.close()
 

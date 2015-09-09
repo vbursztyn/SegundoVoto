@@ -13,6 +13,9 @@ raw_candidates = LOAD 'raw_candidates/consulta_cand_2014_*.txt' USING PigStorage
 --First application-related filter: congressmen only.
 congressmen_only = FILTER raw_donations BY (title == '"Deputado Federal"');
 
+--Second application-related filter: successfull campaigns only.
+successfull_only = FILTER raw_candidates BY (status_id != '"4"');
+
 --From the original data, select a few columns of interest.
 extracted_columns_1 = FOREACH congressmen_only GENERATE customFormatting.removeQuotes(TSE_candidate_id) AS TSE_candidate_id, customFormatting.removeQuotes(state) AS state, customFormatting.removeQuotes(party) AS party, customFormatting.removeQuotes(title) AS title, customFormatting.formatName(candidate_fullname) AS candidate_fullname, (FLOAT) customFormatting.formatToFloat(donation_value) AS donation_value, customFormatting.removeQuotes(original_donator_id) AS original_donator_id, customFormatting.formatName(original_donator_name) AS original_donator_name, customFormatting.removeQuotes(original_donator_type) AS original_donator_type;
 
@@ -21,7 +24,7 @@ grouped_by_campaign = GROUP extracted_columns_1 BY TSE_candidate_id;
 total_donations = FOREACH grouped_by_campaign GENERATE group, SUM(extracted_columns_1.donation_value);
 
 --From the original data, select a few columns of interest.
-extracted_columns_2 = FOREACH raw_candidates GENERATE customFormatting.removeQuotes(TSE_candidate_id) AS TSE_candidate_id, customFormatting.formatName(candidate_name) AS candidate_name;
+extracted_columns_2 = FOREACH successfull_only GENERATE customFormatting.removeQuotes(TSE_candidate_id) AS TSE_candidate_id, customFormatting.formatName(candidate_name) AS candidate_name;
 
 --Filter out all donations we can say for sure do not originate from companies.
 filter_out_citizens = FILTER extracted_columns_1 BY (original_donator_type != 'F');

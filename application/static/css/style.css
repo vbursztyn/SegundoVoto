@@ -9,15 +9,19 @@ body {
 	background-color: white;
 }
 
+.jumbotron b {
+	font-size: 20px;
+}
+
 .jumbotron h1 {
 	text-align: center;
 	margin-bottom: 5%;
 }
 
 .jumbotron .disclaimer {
-	margin-right: 2%;
-	margin-left: 10%;
-	width: 45%;
+	margin-right: 16%;
+	margin-left: 16%;
+	width: 70%%;
 	vertical-align: top;
 	display: inline-block;
 }
@@ -31,7 +35,7 @@ body {
 	margin-left: 2%;
 	width: 20%;
 	vertical-align: top;
-	display: inline-block;
+	display: none;
 }
 
 .jumbotron img {
